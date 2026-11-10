@@ -1,0 +1,66 @@
+THUYẾT MINH CHỨC NĂNG MÔ PHỎNG KẸT XE — TRAFFICMIND AI
+
+1. Mục đích
+Chức năng này cho phép người trình bày tự tạo một kịch bản kẹt xe để minh họa cách hệ thống đánh giá tuyến đường. Đây là dữ liệu mô phỏng do người dùng cung cấp, không phải dữ liệu giao thông thực.
+
+2. Các tệp đã chỉnh sửa
+- app.py: thêm API tạo/đọc/sửa/xóa điểm mô phỏng, lưu JSON, đo khoảng cách Haversine, cộng thời gian phạt vào kết quả và chấm điểm tuyến.
+- data.py: thêm lay_cac_lo_trinh(), gọi OSRM yêu cầu tối đa ba phương án nếu dịch vụ hỗ trợ. Mỗi phương án chứa km, phút và tọa độ để vẽ.
+- templates/index.html: thêm bảng điều khiển mô phỏng dưới bản đồ.
+- static/js/app.js: xử lý chọn điểm trên bản đồ, tìm theo địa chỉ, vẽ vòng tròn màu theo mức độ, hiển thị danh sách điểm, bật/tắt/xóa và cảnh báo âm thanh.
+- static/css/style.css: định dạng thẻ mô phỏng, danh sách điểm, trạng thái và con trỏ đặt điểm.
+- data/simulated_jams.json: tệp dữ liệu được tự tạo khi thêm điểm mô phỏng đầu tiên.
+
+3. API
+GET /api/simulations/jams: trả danh sách các điểm đã lưu.
+POST /api/simulations/jams: tạo điểm mới; cần vi_do, kinh_do; tùy chọn muc_do (nhe/vua/nang), ban_kinh_m.
+PATCH /api/simulations/jams/<id>: bật hoặc tắt điểm theo trường dang_bat.
+DELETE /api/simulations/jams/<id>: xóa một điểm.
+POST /api/simulations/jams/reset: xóa tất cả điểm.
+
+4. Công thức mô phỏng
+- Nhẹ: mức phạt tối đa 5 phút.
+- Vừa: mức phạt tối đa 12 phút.
+- Nặng: mức phạt tối đa 22 phút.
+- Nếu điểm gần tuyến hơn, tác động lớn hơn; nếu tuyến cách xa vùng bán kính hơn 150 m, không cộng thời gian.
+- Thời gian tuyến để so sánh = thời gian OSRM × hệ số khung giờ + tổng thời gian phạt của các vùng mô phỏng.
+- Ứng dụng chọn tuyến có thời gian ước tính nhỏ nhất trong số phương án OSRM thực sự trả về. Không được tuyên bố luôn có ba tuyến: dịch vụ có thể chỉ trả một tuyến.
+
+5. Giải thích các hàm quan trọng
+app.py / doc_diem_ket_xe_mo_phong(): đọc JSON và trả danh sách rỗng nếu chưa có tệp hoặc tệp lỗi.
+app.py / luu_diem_ket_xe_mo_phong(): tạo thư mục data và lưu danh sách dưới dạng JSON có dấu tiếng Việt.
+app.py / khoang_cach_hai_diem_km(): dùng công thức Haversine để đo khoảng cách địa lý giữa hai tọa độ.
+app.py / tinh_tac_dong_diem_ket_xe(): bỏ qua điểm đang tắt; tìm điểm tuyến gần nhất với tâm kẹt xe; so sánh với bán kính; tính số phút phạt theo mức độ và độ gần.
+app.py / api_diem_ket_xe_mo_phong(): xử lý GET và POST; kiểm tra tọa độ, bán kính 100–3000 m, mức độ hợp lệ; tạo ID và thời điểm; lưu xuống JSON.
+app.py / api_sua_diem_ket_xe_mo_phong(): PATCH dùng để bật/tắt; DELETE để xóa một điểm.
+app.py / api_xoa_tat_ca_diem_mo_phong(): ghi danh sách rỗng để đặt lại toàn bộ mô phỏng.
+app.py / api_lo_trinh(): lấy các tuyến OSRM; tính thời gian phạt cho từng tuyến; chọn tuyến có thời gian ước tính nhỏ nhất; dự đoán thời gian và cộng phần mô phỏng; trả nguồn và mức cộng thêm trong JSON.
+data.py / lay_cac_lo_trinh(): yêu cầu OSRM trả tuyến alternatives=true; chuẩn hóa tọa độ từ [kinh độ, vĩ độ] sang [vĩ độ, kinh độ] cho Leaflet; giới hạn ba phương án.
+JavaScript / taoDiemMoPhong(): gửi dữ liệu lên Flask; cập nhật danh sách và vẽ vùng; tự tính lại chuyến đi nếu đã có tuyến.
+JavaScript / veCacDiemMoPhong(): vẽ vòng tròn màu vàng/cam/đỏ tùy mức độ và dấu tâm điểm.
+JavaScript / capNhatTrangThaiDiem(), xoaDiemMoPhong(): gửi PATCH/DELETE và làm mới giao diện.
+JavaScript / phatCanhBaoKetXe(): dùng Web Audio API tạo tiếng bíp ngắn; nếu trình duyệt chặn âm thanh, chức năng bản đồ vẫn hoạt động.
+
+6. Kiểm thử thủ công
+1) Khởi động Flask và mở http://127.0.0.1:5000.
+2) Bấm “Đặt điểm trên bản đồ” rồi chọn một vị trí nằm gần tuyến đi.
+3) Tạo điểm mức độ Nặng, bán kính 1 km. Kiểm tra vòng tròn đỏ xuất hiện và danh sách có điểm mới.
+4) Tìm một tuyến đi qua gần điểm đó. Kiểm tra phần “Thời gian mô phỏng cộng thêm” và nhãn cảnh báo.
+5) Tắt điểm; tính lại; phần thời gian mô phỏng phải giảm hoặc về 0.
+6) Xóa điểm; kiểm tra vòng tròn biến mất.
+7) Tạo điểm bằng địa chỉ và thử “Xóa tất cả”.
+8) Tải lại trang; các điểm còn bật phải được khôi phục từ JSON.
+9) Nếu OSRM không trả tuyến thay thế hoặc Internet bị ngắt, kết quả sẽ dùng tuyến dự phòng và phải hiển thị nguồn dự phòng.
+
+7. Giới hạn cần nói khi bảo vệ
+Mức phạt theo phút là quy tắc mô phỏng minh họa, không phải số đo thực tế. Random Forest trong dự án hiện học từ dữ liệu tổng hợp. Để nghiên cứu dự báo ùn tắc thực tế cần dữ liệu giao thông có nhãn và đánh giá trên tập kiểm tra độc lập. OSRM/OpenStreetMap cung cấp bản đồ/định tuyến nhưng không tự động có dữ liệu tốc độ giao thông thời gian thực.
+
+
+THUẬT TOÁN A* ĐƯỢC BỔ SUNG
+1. Mục đích: lựa chọn đường có tổng chi phí thấp trong đồ thị tuyến ứng viên.
+2. Nút: tọa độ trên các tuyến do OSRM cung cấp, được làm tròn để gộp các điểm gần nhau.
+3. Cạnh: các đoạn liên tiếp của đường hình học tuyến ứng viên.
+4. Chi phí cạnh: thời gian cơ bản phân bổ theo độ dài đoạn, nhân hệ số giờ; cộng thêm mức phạt mô phỏng khi đoạn nằm trong vùng ùn tắc.
+5. Hàm heuristic: khoảng cách Haversine còn lại tới đích nhân hệ số thấp 0,3 phút/km.
+6. Giới hạn: đồ thị chỉ gồm các tuyến ứng viên; A* không tự tải toàn bộ mạng đường. Nếu OSRM không trả được tuyến, hệ thống dùng dự phòng và không thể bảo đảm tìm được đường A* thực tế.
+7. Vai trò học máy: Random Forest dự đoán thời gian theo dữ liệu mô hình; A* tìm kiếm tuyến trên đồ thị. Hai thành phần có vai trò khác nhau.

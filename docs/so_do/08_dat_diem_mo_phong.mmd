@@ -1,0 +1,7 @@
+flowchart TD
+    A0["Người dùng chọn mức độ + bán kính"] --> A1
+    A1["Chọn điểm trên bản đồ hoặc nhập địa chỉ"] --> A2
+    A2["JavaScript gửi tọa độ lên Flask API"] --> A3
+    A3["Flask kiểm tra dữ liệu đầu vào"] --> A4
+    A4["Lưu điểm vào data/simulated_jams.json"] --> A5
+    A5["Vẽ vòng tròn và dấu kẹt xe trên bản đồ"]

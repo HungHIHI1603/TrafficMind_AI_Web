@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="600" viewBox="0 0 920 600">
+<rect width="920" height="600" fill="#f8fafc"/>
+<text x="460" y="42" text-anchor="middle" font-family="Arial" font-size="24" font-weight="bold" fill="#183153">Sơ đồ A* tìm đường tránh kẹt xe mô phỏng</text>
+<g font-family="Arial" font-size="16" text-anchor="middle" fill="#17324d" stroke="#4778f5" stroke-width="2">
+<rect x="280" y="75" width="360" height="55" rx="12" fill="#eaf1ff"/><text x="460" y="108" stroke="none">Nhận các tuyến ứng viên từ OSRM</text>
+<path d="M460 130 V160" stroke="#64748b"/><path d="M453 153 L460 161 L467 153" fill="none" stroke="#64748b"/>
+<rect x="280" y="162" width="360" height="55" rx="12" fill="#eaf1ff"/><text x="460" y="195" stroke="none">Ghép các điểm thành đồ thị</text>
+<path d="M460 217 V247" stroke="#64748b"/><path d="M453 240 L460 248 L467 240" fill="none" stroke="#64748b"/>
+<rect x="230" y="249" width="460" height="65" rx="12" fill="#fff3d6" stroke="#d97706"/><text x="460" y="275" stroke="none">Tính chi phí cạnh: thời gian + phạt</text><text x="460" y="296" stroke="none">nếu bị ảnh hưởng bởi kẹt xe mô phỏng</text>
+<path d="M460 314 V344" stroke="#64748b"/><path d="M453 337 L460 345 L467 337" fill="none" stroke="#64748b"/>
+<rect x="280" y="346" width="360" height="55" rx="12" fill="#eaf1ff"/><text x="460" y="379" stroke="none">A* tìm đường có chi phí thấp</text>
+<path d="M460 401 V431" stroke="#64748b"/><path d="M453 424 L460 432 L467 424" fill="none" stroke="#64748b"/>
+<rect x="280" y="433" width="360" height="55" rx="12" fill="#e5f7ec" stroke="#0d9f6e"/><text x="460" y="466" stroke="none">So sánh và hiển thị tuyến gợi ý</text>
+</g>
+<text x="460" y="535" text-anchor="middle" font-family="Arial" font-size="14" fill="#64748b">Giới hạn: A* chỉ tìm trong đồ thị tạo từ các tuyến ứng viên đã có.</text>
+</svg>

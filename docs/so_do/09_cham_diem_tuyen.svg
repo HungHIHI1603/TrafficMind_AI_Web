@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="686" viewBox="0 0 900 686">
+<rect width="100%" height="100%" fill="#f5f8ff"/>
+<text x="450" y="42" font-family="Arial,sans-serif" font-size="23" font-weight="700" text-anchor="middle" fill="#10233f">Sơ đồ 09 — Chấm điểm và chọn tuyến</text>
+<rect x="145" y="68" width="610" height="48" rx="10" fill="white" stroke="#4e77e8" stroke-width="1.5"/>
+<text x="450" y="97" font-family="Arial,sans-serif" font-size="15" text-anchor="middle" fill="#243754">Địa chỉ đi / đến được định vị</text>
+<path d="M450 116 v22 m-6 -6 l6 6 l6 -6" fill="none" stroke="#4e77e8" stroke-width="2"/>
+<rect x="145" y="146" width="610" height="48" rx="10" fill="white" stroke="#4e77e8" stroke-width="1.5"/>
+<text x="450" y="175" font-family="Arial,sans-serif" font-size="15" text-anchor="middle" fill="#243754">OSRM trả về tối đa 3 tuyến (nếu có)</text>
+<path d="M450 194 v22 m-6 -6 l6 6 l6 -6" fill="none" stroke="#4e77e8" stroke-width="2"/>
+<rect x="145" y="224" width="610" height="48" rx="10" fill="white" stroke="#4e77e8" stroke-width="1.5"/>
+<text x="450" y="253" font-family="Arial,sans-serif" font-size="15" text-anchor="middle" fill="#243754">Đọc các điểm mô phỏng đang bật</text>
+<path d="M450 272 v22 m-6 -6 l6 6 l6 -6" fill="none" stroke="#4e77e8" stroke-width="2"/>
+<rect x="145" y="302" width="610" height="48" rx="10" fill="white" stroke="#4e77e8" stroke-width="1.5"/>
+<text x="450" y="331" font-family="Arial,sans-serif" font-size="15" text-anchor="middle" fill="#243754">Đo khoảng cách từ vùng mô phỏng đến từng tuyến</text>
+<path d="M450 350 v22 m-6 -6 l6 6 l6 -6" fill="none" stroke="#4e77e8" stroke-width="2"/>
+<rect x="145" y="380" width="610" height="48" rx="10" fill="white" stroke="#4e77e8" stroke-width="1.5"/>
+<text x="450" y="409" font-family="Arial,sans-serif" font-size="15" text-anchor="middle" fill="#243754">Cộng thời gian phạt theo mức độ + khoảng cách</text>
+<path d="M450 428 v22 m-6 -6 l6 6 l6 -6" fill="none" stroke="#4e77e8" stroke-width="2"/>
+<rect x="145" y="458" width="610" height="48" rx="10" fill="white" stroke="#4e77e8" stroke-width="1.5"/>
+<text x="450" y="487" font-family="Arial,sans-serif" font-size="15" text-anchor="middle" fill="#243754">Chọn tuyến có thời gian ước tính thấp nhất</text>
+<path d="M450 506 v22 m-6 -6 l6 6 l6 -6" fill="none" stroke="#4e77e8" stroke-width="2"/>
+<rect x="145" y="536" width="610" height="48" rx="10" fill="white" stroke="#4e77e8" stroke-width="1.5"/>
+<text x="450" y="565" font-family="Arial,sans-serif" font-size="15" text-anchor="middle" fill="#243754">Hiển thị thời gian và nguồn dữ liệu rõ ràng</text>
+</svg>

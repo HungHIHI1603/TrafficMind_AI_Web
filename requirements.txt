@@ -1,0 +1,6 @@
+# Các thư viện Python cần cài để chạy giao diện web và mô hình học máy.
+Flask>=3.0,<4.0  # Tạo máy chủ web và API kết nối HTML với Python.
+requests>=2.31  # Gọi dịch vụ tìm địa chỉ và định tuyến.
+numpy>=1.26  # Xử lý dữ liệu số cho mô hình học máy.
+scikit-learn>=1.4  # Huấn luyện mô hình Random Forest.
+joblib>=1.3  # Lưu và tải mô hình đã huấn luyện.

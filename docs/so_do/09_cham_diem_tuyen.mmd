@@ -1,0 +1,8 @@
+flowchart TD
+    A0["Địa chỉ đi / đến được định vị"] --> A1
+    A1["OSRM trả về tối đa 3 tuyến (nếu có)"] --> A2
+    A2["Đọc các điểm mô phỏng đang bật"] --> A3
+    A3["Đo khoảng cách từ vùng mô phỏng đến từng tuyến"] --> A4
+    A4["Cộng thời gian phạt theo mức độ + khoảng cách"] --> A5
+    A5["Chọn tuyến có thời gian ước tính thấp nhất"] --> A6
+    A6["Hiển thị thời gian và nguồn dữ liệu rõ ràng"]

@@ -1,0 +1,88 @@
+<!DOCTYPE html> <!-- Khai báo tài liệu HTML5. -->
+<html lang="vi"> <!-- Đặt ngôn ngữ trang là tiếng Việt. -->
+<head> <!-- Bắt đầu phần thông tin trang web. -->
+  <meta charset="UTF-8"> <!-- Cho phép hiển thị tiếng Việt. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Giúp giao diện thích ứng với màn hình nhỏ. -->
+  <title>TrafficMind AI | Trợ lý lộ trình</title> <!-- Đặt tiêu đề trên tab trình duyệt. -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"> <!-- Nạp kiểu dáng bản đồ Leaflet. -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"> <!-- Nạp tệp CSS do dự án quản lý. -->
+</head> <!-- Kết thúc phần thông tin trang. -->
+<body> <!-- Bắt đầu nội dung hiển thị. -->
+<div class="app-shell"> <!-- Bao toàn bộ bố cục ứng dụng. -->
+  <aside class="sidebar"> <!-- Tạo thanh điều hướng bên trái. -->
+    <div class="brand"><div class="brand-icon">↗</div><div><strong>TrafficMind <span>AI</span></strong><small>SMART ROUTE ASSISTANT</small></div></div> <!-- Hiển thị logo và tên ứng dụng. -->
+    <div class="nav-label">KHÔNG GIAN LÀM VIỆC</div> <!-- Hiển thị nhãn nhóm điều hướng. -->
+    <button class="nav-item active" data-panel="route">⌖ <span>Tìm đường thông minh</span></button> <!-- Nút mở tính năng tìm đường. -->
+    <button class="nav-item" data-panel="compare">⇄ <span>So sánh phương tiện</span></button>
+    <button class="nav-item" data-panel="simulation">🚦 <span>Mô phỏng kẹt xe</span></button>
+    <button class="nav-item" data-panel="ml-lab">🧠 <span>Phòng thí nghiệm ML</span></button> <!-- Nút mở so sánh phương tiện. -->
+    <button class="nav-item" data-panel="history">◷ <span>Lịch sử chuyến đi</span></button> <!-- Nút mở lịch sử tìm đường. -->
+    <div class="sidebar-bottom"><div class="status-dot"></div><div><strong>OpenStreetMap</strong><small>Dữ liệu bản đồ trực tuyến</small></div></div> <!-- Thông tin nguồn bản đồ. -->
+  </aside> <!-- Kết thúc thanh điều hướng. -->
+  <main class="main-content"> <!-- Bắt đầu khu vực nội dung chính. -->
+    <header class="topbar"><div><div class="eyebrow">AI-POWERED NAVIGATION</div><h1>Hành trình thông minh hơn.</h1><p>Lên kế hoạch di chuyển, ước tính chi phí và tham khảo nguy cơ ùn tắc.</p></div><div class="top-badge">✦ <span>Machine Learning</span></div></header> <!-- Hiển thị tiêu đề trang và nhãn học máy. -->
+    <section id="route-panel" class="panel active-panel"> <!-- Tạo bảng điều khiển tìm đường. -->
+      <div class="workspace"> <!-- Chia khu vực thành bảng nhập và bản đồ. -->
+        <section class="search-card card"> <!-- Thẻ nhập thông tin chuyến đi. -->
+          <div class="card-heading"><div><span class="section-kicker">LỘ TRÌNH CỦA BẠN</span><h2>Đi đâu hôm nay?</h2></div><div class="heading-icon">⌁</div></div> <!-- Tiêu đề thẻ nhập liệu. -->
+          <form id="route-form"> <!-- Tạo biểu mẫu tìm đường. -->
+            <label for="diem_di">Điểm xuất phát</label> <!-- Nhãn ô điểm đi. -->
+            <div class="input-with-icon"><span class="pin start-pin">●</span><input id="diem_di" name="diem_di" list="goi-y-diem-di" autocomplete="off" placeholder="Ví dụ: 12 Nguyễn Huệ, Quận 1, TP.HCM" value="Bến Thành, Quận 1, TP. Hồ Chí Minh" required><datalist id="goi-y-diem-di"></datalist></div> <!-- Nhập địa chỉ xuất phát. -->
+            <button type="button" id="swap-btn" class="swap-btn" title="Đổi điểm đi và điểm đến">↕ Đổi điểm đi / đến</button> <!-- Tạo nút đảo hai địa chỉ. -->
+            <label for="diem_den">Điểm đến</label> <!-- Nhãn ô điểm đến. -->
+            <div class="input-with-icon"><span class="pin end-pin">●</span><input id="diem_den" name="diem_den" list="goi-y-diem-den" autocomplete="off" placeholder="Nhập địa chỉ, tên đường hoặc địa điểm" value="Đại học Văn Lang cơ sở 3, TP. Hồ Chí Minh" required><datalist id="goi-y-diem-den"></datalist></div> <!-- Nhập địa chỉ đích. -->
+            <div class="form-row"><div><label for="phuong_tien">Phương tiện</label><select id="phuong_tien">{% for pt in phuong_tien %}<option>{{ pt }}</option>{% endfor %}</select></div><div><label for="so_nguoi">Số người</label><input id="so_nguoi" type="number" min="1" max="50" value="1"></div></div> <!-- Chọn phương tiện và số người. -->
+            <label for="khung_gio">Khung giờ dự kiến</label> <!-- Nhãn khung giờ. -->
+            <select id="khung_gio"><option>Ngay bây giờ</option><option>Giờ cao điểm sáng</option><option>Giờ cao điểm chiều</option><option>Ngoài giờ cao điểm</option></select> <!-- Chọn hệ số giao thông giả định. -->
+            <button id="submit-btn" type="submit" class="primary-btn">Tìm lộ trình <span>→</span></button> <!-- Nút gửi yêu cầu tính đường. -->
+            <p class="form-note">✦ Kết quả là ước tính tham khảo, không thay thế dữ liệu giao thông trực tiếp.</p> <!-- Giải thích giới hạn dự đoán. -->
+          </form> <!-- Kết thúc biểu mẫu. -->
+        </section> <!-- Kết thúc thẻ nhập liệu. -->
+        <section class="map-card card"> <!-- Thẻ chứa bản đồ. -->
+          <div class="map-topline"><div><span class="section-kicker">BẢN ĐỒ TRỰC TUYẾN</span><h2>Khám phá tuyến đường</h2></div><span class="live-pill"><i></i> OpenStreetMap</span></div> <!-- Tiêu đề và nhãn nguồn bản đồ. -->
+          <div id="map"></div> <!-- Vùng bản đồ tương tác. -->
+          <div class="map-legend"><span><i class="legend-start"></i> Điểm xuất phát</span><span><i class="legend-route"></i> Tuyến đường</span><span><i class="legend-end"></i> Điểm đến</span></div> <!-- Chú giải các ký hiệu trên bản đồ. -->
+          <section class="simulation-box" aria-label="Công cụ mô phỏng kẹt xe">
+            <div class="simulation-heading"><div><span class="section-kicker">THỬ NGHIỆM KỊCH BẢN</span><h3>🚦 Mô phỏng kẹt xe</h3></div><span class="simulation-badge">DỮ LIỆU GIẢ LẬP</span></div>
+            <p class="simulation-help">Bấm “Đặt điểm trên bản đồ”, sau đó bấm vị trí muốn tạo kẹt xe. Điểm mô phỏng sẽ tác động đến thời gian tuyến đường nếu tuyến đi gần vùng đó.</p>
+            <div class="simulation-actions"><button type="button" id="jam-pick-btn" class="secondary-btn">＋ Đặt điểm trên bản đồ</button><button type="button" id="jam-reset-btn" class="secondary-btn danger-btn">Xóa tất cả</button></div>
+            <label for="jam-address">Hoặc tìm vị trí theo địa chỉ</label><div class="simulation-address-row"><input id="jam-address" placeholder="Ví dụ: Chợ Bến Thành, TP.HCM"><button type="button" id="jam-search-btn" class="secondary-btn">Tìm</button></div>
+            <div class="simulation-fields"><div><label for="jam-severity">Mức độ</label><select id="jam-severity"><option value="nhe">Nhẹ (+5 phút)</option><option value="vua" selected>Vừa (+12 phút)</option><option value="nang">Nặng (+22 phút)</option></select></div><div><label for="jam-radius">Bán kính ảnh hưởng</label><select id="jam-radius"><option value="300">300 mét</option><option value="500" selected>500 mét</option><option value="1000">1 km</option><option value="2000">2 km</option></select></div></div>
+            <div id="jam-status" class="simulation-status" role="status">Chưa đặt điểm mô phỏng.</div><div id="jam-list" class="jam-list"></div>
+          </section>
+        </section> <!-- Kết thúc thẻ bản đồ. -->
+      </div> <!-- Kết thúc bố cục bản đồ và biểu mẫu. -->
+      <div id="message" class="message hidden"></div> <!-- Vùng thông báo thành công hoặc lỗi. -->
+      <section id="results" class="results-section hidden"> <!-- Khu vực kết quả chuyến đi. -->
+        <div class="results-heading"><div><span class="section-kicker">TỔNG QUAN CHUYẾN ĐI</span><h2>Kết quả phân tích</h2></div><span class="estimate-tag">✦ AI estimate</span></div> <!-- Tiêu đề kết quả. -->
+        <div class="metrics-grid"><article class="metric-card"><div class="metric-symbol blue">↗</div><span>Quãng đường</span><strong id="metric-km">—</strong><small>kilomet</small></article><article class="metric-card"><div class="metric-symbol purple">◷</div><span>Thời gian dự kiến</span><strong id="metric-time">—</strong><small>phút di chuyển</small></article><article class="metric-card"><div class="metric-symbol green">₫</div><span>Chi phí tham khảo</span><strong id="metric-cost">—</strong><small>VNĐ / chuyến</small></article><article class="metric-card"><div class="metric-symbol orange">≋</div><span>Giao thông</span><strong id="metric-traffic" class="traffic-value">—</strong><small>ước tính theo khung giờ</small></article></div> <!-- Bốn thẻ số liệu chính. -->
+        <div class="detail-card card"><h3>Thông tin phân tích</h3><p id="route-source"></p><p id="model-note"></p><p id="formula-time"></p><div id="route-alternatives" class="route-alternatives"></div><p class="warning-note">⚠ Dự đoán ùn tắc đang dùng quy tắc khung giờ và mô hình minh họa, chưa kết nối dữ liệu ùn tắc thời gian thực. Giá phương tiện chỉ là ước tính.</p></div> <!-- Hiển thị nguồn và giới hạn mô hình. -->
+      </section> <!-- Kết thúc khu vực kết quả. -->
+    </section> <!-- Kết thúc bảng điều khiển tìm đường. -->
+    <section id="compare-panel" class="panel"> <!-- Tạo trang so sánh phương tiện. -->
+      <div class="page-card card"><span class="section-kicker">CHỌN PHƯƠNG ÁN PHÙ HỢP</span><h2>So sánh phương tiện</h2><p>Hãy tính một lộ trình trước; các thông số của chuyến đi gần nhất sẽ được dùng để minh họa chi phí theo từng phương tiện.</p><button class="primary-btn back-route">Quay lại tìm đường →</button><div id="compare-table" class="table-wrap"><p>Chưa có dữ liệu. Hãy tìm một lộ trình trước.</p></div></div> <!-- Vùng hiển thị bảng so sánh. -->
+    </section> <!-- Kết thúc trang so sánh. -->
+    <section id="ml-lab-panel" class="panel"> <!-- Trang thực nghiệm học máy Chương 1-9. -->
+      <div class="page-card card">
+        <span class="section-kicker">THỰC NGHIỆM HỌC MÁY • CHƯƠNG 1–9</span>
+        <h2>Phòng thí nghiệm mô hình</h2>
+        <p>Chạy các mô hình đã học trên cùng bộ dữ liệu mô phỏng để so sánh dự đoán thời gian, phân loại mức ùn tắc và phân cụm khu vực.</p>
+        <button id="run-ml-lab" class="primary-btn">Chạy thực nghiệm các mô hình →</button>
+        <div id="ml-lab-status" class="simulation-status" role="status">Chưa chạy thực nghiệm.</div>
+        <div id="ml-lab-dataset" class="detail-card card"></div>
+        <h3>1. Hồi quy – dự đoán thời gian (Chương 1, 5, 9)</h3><div id="ml-regression-table" class="table-wrap"><p>Chưa có kết quả.</p></div>
+        <h3>2. Phân loại – mức độ ùn tắc (Chương 2–6)</h3><div id="ml-classification-table" class="table-wrap"><p>Chưa có kết quả.</p></div>
+        <h3>3. Phân cụm – K-Means (Chương 8)</h3><div id="ml-clustering-result" class="detail-card card">Chưa có kết quả.</div>
+        <p class="warning-note">Lưu ý: dữ liệu trong phòng thí nghiệm là dữ liệu tổng hợp phục vụ học tập. Không được diễn giải điểm số này là độ chính xác trên giao thông thật. Chương 7 cung cấp các độ đo đánh giá.</p>
+      </div>
+    </section>
+    <section id="history-panel" class="panel"> <!-- Tạo trang lịch sử chuyến đi. -->
+      <div class="page-card card"><span class="section-kicker">CÁC CHUYẾN ĐI GẦN ĐÂY</span><h2>Lịch sử lộ trình</h2><p>Những chuyến đi được lưu trên máy tính này.</p><button id="refresh-history" class="secondary-btn">↻ Làm mới lịch sử</button><div id="history-table" class="table-wrap"></div></div> <!-- Vùng bảng lịch sử. -->
+    </section> <!-- Kết thúc trang lịch sử. -->
+    <footer>TrafficMind AI <span>•</span> Đồ án Học máy và ứng dụng <span>•</span> Bản đồ © OpenStreetMap contributors</footer> <!-- Chân trang. -->
+  </main> <!-- Kết thúc nội dung chính. -->
+</div> <!-- Kết thúc bố cục ứng dụng. -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script> <!-- Nạp thư viện bản đồ Leaflet. -->
+<script src="{{ url_for('static', filename='js/app.js') }}"></script> <!-- Nạp JavaScript tương tác. -->
+</body> <!-- Kết thúc nội dung trang. -->
+</html> <!-- Kết thúc tài liệu HTML. -->

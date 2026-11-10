@@ -1,0 +1,84 @@
+PHẠM VI HỌC THUẬT TRAFFICMIND AI – HỌC MÁY VÀ ỨNG DỤNG
+====================================================
+
+Mục tiêu
+--------
+Giữ nguyên ứng dụng bản đồ, tìm đường, mô phỏng kẹt xe và bổ sung một phòng thí nghiệm
+để sinh viên trình bày các mô hình/độ đo thuộc phạm vi Chương 1 đến Chương 9.
+
+Ánh xạ chương học với mã nguồn
+------------------------------
+Chương 1 – Hồi quy tuyến tính:
+  ml_lab.py / LinearRegression; dự đoán thời gian dạng số liên tục.
+  Độ đo: MAE, RMSE, R².
+
+Chương 2 – Hồi quy Logistic:
+  ml_lab.py / LogisticRegression; phân loại mức ùn tắc nhẹ, vừa, cao.
+  Lưu ý: dù tên có chữ hồi quy, Logistic Regression được dùng cho phân loại.
+
+Chương 3 – Naive Bayes:
+  ml_lab.py / GaussianNB; phân loại ba mức ùn tắc.
+
+Chương 4 – KNN:
+  ml_lab.py / KNeighborsClassifier; phân loại dựa trên các mẫu gần nhất.
+  Pipeline có StandardScaler để khoảng cách không bị một đặc trưng lớn chi phối.
+
+Chương 5 – Cây quyết định và rừng ngẫu nhiên:
+  ml_lab.py / DecisionTreeClassifier, RandomForestClassifier và RandomForestRegressor.
+
+Chương 6 – SVM:
+  ml_lab.py / SVC; phân loại ba mức ùn tắc. Pipeline chuẩn hóa đặc trưng.
+
+Chương 7 – Đánh giá mô hình:
+  Hồi quy: MAE, RMSE, R².
+  Phân loại: Accuracy, Precision macro, Recall macro, F1 macro, Confusion Matrix.
+  Phân cụm: Silhouette Score.
+
+Chương 8 – K-Means:
+  ml_lab.py / KMeans với K=3; không sử dụng nhãn phân loại trong quá trình phân cụm.
+
+Chương 9 – MLP:
+  ml_lab.py / MLPRegressor với hai lớp ẩn 64 và 32 nút, activation ReLU, solver Adam.
+  StandardScaler nằm trong Pipeline.
+
+Luồng chạy
+----------
+1. Người dùng mở menu “Phòng thí nghiệm ML”.
+2. Bấm “Chạy thực nghiệm các mô hình”.
+3. JavaScript gọi GET /api/ml-lab.
+4. Flask trong app.py gọi chay_thuc_nghiem() từ ml_lab.py.
+5. ml_lab.py tạo dữ liệu tổng hợp cố định seed=42, chia train/test 80/20.
+6. Các mô hình hồi quy được huấn luyện và so sánh trên cùng tập test.
+7. Các mô hình phân loại được huấn luyện và so sánh trên cùng tập test.
+8. K-Means phân cụm dữ liệu đã chuẩn hóa; tính Silhouette Score.
+9. Flask trả JSON; JavaScript hiển thị bảng chỉ số và ghi chú dữ liệu.
+
+Đặc trưng mô phỏng
+------------------
+- Quãng đường (km).
+- Giờ trong ngày.
+- Mưa (biến giả lập 0/1).
+- Loại đường (mã 0/1/2).
+- Giờ cao điểm (0/1).
+- Mức tắc nghẽn mô phỏng (biến liên tục; chỉ dùng cho hồi quy và phân cụm).
+
+Nhãn
+----
+- y_time: thời gian di chuyển mô phỏng (phút), dùng cho hồi quy.
+- y_class: mức ùn tắc 0/1/2 (nhẹ/vừa/cao), dùng cho phân loại.
+- Phân loại không nhận biến mức tắc nghẽn dùng để sinh nhãn làm đầu vào, tránh rò rỉ nhãn.
+
+Giới hạn và cách trình bày trung thực
+------------------------------------
+Dữ liệu 2.400 mẫu do chương trình tự sinh theo quy tắc mô phỏng, không phải dữ liệu GPS,
+camera, cảm biến hay lịch sử giao thông thu thập ngoài đời. Điểm số chỉ phản ánh khả năng
+mô hình khớp với bộ dữ liệu mô phỏng. Không được kết luận mô hình đạt độ chính xác tương
+ứng trên đường phố thực tế. Khi có dữ liệu thật, cần thay hàm tao_bo_du_lieu(), giữ nguyên
+quy trình chia tập và đánh giá, sau đó chạy lại thí nghiệm.
+
+Phân biệt thành phần:
+- Random Forest/Linear Regression/Logistic Regression/Naive Bayes/KNN/Decision Tree/SVM/MLP/K-Means: mô hình thuộc nội dung môn học.
+- A*: thuật toán tìm kiếm đường, không phải mô hình học máy trong 9 chương.
+- OSRM: dịch vụ định tuyến lấy tuyến ứng viên.
+- Leaflet/OpenStreetMap: hiển thị bản đồ.
+- Nominatim/Photon: tìm địa chỉ và tọa độ.
